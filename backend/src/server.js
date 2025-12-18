@@ -5,7 +5,6 @@ import { connectDB } from "./lib/db.js";
 const app = express();
 
 const __dirname = path.resolve();
-const port = process.env.PORT || 3000;
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "Success from api" });
 });
