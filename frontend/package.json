@@ -19,6 +19,7 @@
     "canvas-confetti": "^1.9.3",
     "career-connect": "file:..",
     "daisyui": "^5.3.10",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
