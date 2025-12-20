@@ -1,0 +1,44 @@
+<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Forest gradient -->
+    <linearGradient id="forestGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b5e20"/>
+      <stop offset="50%" stop-color="#2e7d32"/>
+      <stop offset="100%" stop-color="#66bb6a"/>
+    </linearGradient>
+
+    <!-- Soft glow -->
+    <filter id="forestGlow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="70" cy="70" r="60" fill="#0b2f17"/>
+
+  <!-- Growth / connection symbol -->
+  <g filter="url(#forestGlow)">
+    <!-- Trunk -->
+    <path d="M70 95 L70 55"
+          stroke="url(#forestGradient)"
+          stroke-width="5"
+          stroke-linecap="round"/>
+
+    <!-- Branches -->
+    <path d="M70 65 L45 45" stroke="url(#forestGradient)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M70 65 L95 45" stroke="url(#forestGradient)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M70 80 L50 70" stroke="url(#forestGradient)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M70 80 L90 70" stroke="url(#forestGradient)" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Leaves / nodes -->
+    <circle cx="45" cy="45" r="4" fill="#81c784"/>
+    <circle cx="95" cy="45" r="4" fill="#81c784"/>
+    <circle cx="50" cy="70" r="4" fill="#66bb6a"/>
+    <circle cx="90" cy="70" r="4" fill="#66bb6a"/>
+    <circle cx="70" cy="55" r="5" fill="#a5d6a7"/>
+  </g>
+</svg>
