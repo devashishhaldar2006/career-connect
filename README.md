@@ -9,7 +9,7 @@
 
 **A real-time collaborative coding interview platform with video calls, chat, and live code execution**
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure) • [API Documentation](#-api-documentation)
+[Demo](#-demo) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure) • [API Documentation](#-api-documentation)
 
 </div>
 
@@ -18,6 +18,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [Demo](#-demo)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
@@ -43,6 +44,24 @@
 - 🔐 **Secure Authentication** - Clerk-based authentication with protected routes
 - 📊 **Session Management** - Create, join, and manage coding sessions with problem tracking
 - 📈 **Dashboard Analytics** - View active sessions, recent activity, and statistics
+
+---
+
+## 🎥 Demo
+
+Watch the full demo video to see Career Connect in action:
+
+**🎬 [Watch Demo Video](https://www.youtube.com/watch?v=kNLFTHZtrP8)**
+
+The demo showcases:
+
+- Real-time video conferencing
+- Collaborative code editing
+- Live code execution
+- Chat functionality
+- Session management
+
+You can also access the demo directly from the homepage by clicking the "Watch Demo" button.
 
 ---
 
