@@ -7,13 +7,10 @@ import {
   UsersIcon,
   VideoIcon,
   ZapIcon,
-  XIcon,
 } from "lucide-react";
 import { SignInButton } from "@clerk/clerk-react";
-import { useState } from "react";
 
 function HomePage() {
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   return (
     <div className="bg-gradient-to-br from-base-100 via-base-200 to-base-300">
       {/* NAVBAR */}
@@ -97,10 +94,7 @@ function HomePage() {
                 </button>
               </SignInButton>
 
-              <button
-                className="btn btn-outline btn-lg"
-                onClick={() => setIsDemoModalOpen(true)}
-              >
+              <button className="btn btn-outline btn-lg">
                 <VideoIcon className="size-5" />
                 Watch Demo
               </button>
@@ -190,43 +184,6 @@ function HomePage() {
           </div>
         </div>
       </div>
-
-      {/* DEMO VIDEO MODAL */}
-      {isDemoModalOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-4xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-2xl">Watch Demo</h3>
-              <button
-                className="btn btn-sm btn-circle btn-ghost"
-                onClick={() => setIsDemoModalOpen(false)}
-                type="button"
-              >
-                <XIcon className="size-5" />
-              </button>
-            </div>
-
-            <div className="aspect-video w-full rounded-lg overflow-hidden bg-base-200">
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/kNLFTHZtrP8"
-                title="CareerConnect Demo"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-
-            <p className="text-sm text-base-content/60 mt-4 text-center">
-              Career Connect – A Real-Time Collaborative Coding Interview
-              Platform (Full Demo)
-            </p>
-          </div>
-          <div
-            className="modal-backdrop"
-            onClick={() => setIsDemoModalOpen(false)}
-          />
-        </div>
-      )}
     </div>
   );
 }
