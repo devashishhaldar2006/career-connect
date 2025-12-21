@@ -200,6 +200,7 @@ function HomePage() {
               <button
                 className="btn btn-sm btn-circle btn-ghost"
                 onClick={() => setIsDemoModalOpen(false)}
+                type="button"
               >
                 <XIcon className="size-5" />
               </button>
@@ -212,7 +213,7 @@ function HomePage() {
                 title="CareerConnect Demo"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-              ></iframe>
+              />
             </div>
 
             <p className="text-sm text-base-content/60 mt-4 text-center">
@@ -223,7 +224,7 @@ function HomePage() {
           <div
             className="modal-backdrop"
             onClick={() => setIsDemoModalOpen(false)}
-          ></div>
+          />
         </div>
       )}
     </div>
