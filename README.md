@@ -488,7 +488,7 @@ This project is licensed under the ISC License.
 **Devashish Haldar**
 
 - GitHub: [@devashishhaldar2006](https://github.com/devashishhaldar2006)
-- Project Link: [https://github.com/devashishhaldar2006/career-connect](https://github.com/devashishhaldar2006/career-connect)
+- Live Link: [[https://github.com/devashishhaldar2006/career-connect](https://career-connect-4gbj.onrender.com/)]([https://github.com/devashishhaldar2006/career-connect](https://career-connect-4gbj.onrender.com/))
 
 ---
 
