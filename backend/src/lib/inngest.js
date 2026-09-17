@@ -23,7 +23,7 @@ const syncUser = inngest.createFunction(
 
     await User.create(newUser);
 
-    //todo : do something else
+
     await upsertStreamUser({
       id: newUser.clerkId.toString(),
       name: newUser.name,
