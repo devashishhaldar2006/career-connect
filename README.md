@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="frontend/public/forest-logo.svg" alt="CareerConnect Logo" width="96" height="96" />
+
 # 🚀 Career Connect
 ### Real-Time Collaborative Technical Interview & Pair Programming Platform
 
@@ -12,7 +14,13 @@
   <b>Practice coding interviews in real-time with integrated HD video streaming, synchronized chat channels, interactive Monaco code editing, multi-language sandbox execution, and event-driven user orchestration.</b>
 </p>
 
-[🌐 Live Application](https://career-connect-main.onrender.com) • [📡 Backend Health Check](https://career-connect-main.onrender.com/api/health) • [📖 Documentation](#-architecture--system-design) • [⚡ Quickstart](#-getting-started) • [📬 API Reference](#-api-documentation)
+[🌐 Live Application](https://career-connect-main.onrender.com) • [📡 Backend Health Check](https://career-connect-main.onrender.com/api/health) • [📖 Documentation](#-system-architecture) • [⚡ Quickstart](#-getting-started-local-development) • [📬 API Reference](#-api-documentation)
+
+---
+
+### 📸 Platform Preview
+
+<img src="frontend/public/screenshot-for-readme.png" alt="Career Connect Live Interview Room Preview" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
 
 ---
 
@@ -23,6 +31,7 @@
 - [Overview](#-overview)
 - [System Architecture](#-system-architecture)
 - [Key Features](#-key-features)
+- [Supported Execution Languages](#-supported-execution-languages)
 - [Tech Stack Deep-Dive](#-tech-stack-deep-dive)
 - [Project Directory Structure](#-project-directory-structure)
 - [API Documentation](#-api-documentation)
@@ -123,6 +132,22 @@ flowchart TD
 ### 4. 🔒 Enterprise-Grade Identity & Syncing
 - **Clerk Authentication**: Social logins (Google, GitHub) + passwordless session tokens.
 - **Asynchronous Webhook Sync**: Background event queues via Inngest synchronizing Clerk `user.created` and `user.deleted` events directly with MongoDB and Stream user directories.
+
+---
+
+## ⚡ Supported Execution Languages
+
+The in-browser sandbox connects directly to the Piston engine, executing user code against structured test suites in isolated runner environments:
+
+<div align="center">
+
+| Language | Logo | Runtime Version | Supported Features |
+| :---: | :---: | :---: | :--- |
+| **JavaScript** | <img src="frontend/public/javascript.png" width="36" height="36" alt="JavaScript" /> | Node.js `18.15.0` | Modern ES6+, standard I/O test assertion runner |
+| **Python** | <img src="frontend/public/python.png" width="36" height="36" alt="Python" /> | Python `3.10.0` | Pythonic data structures, standard algorithms, assertions |
+| **Java** | <img src="frontend/public/java.png" width="36" height="36" alt="Java" /> | OpenJDK `15.0.2` | Strong type checking, OOP paradigms, class-based harnesses |
+
+</div>
 
 ---
 
