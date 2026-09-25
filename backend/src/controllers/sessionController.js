@@ -145,13 +145,20 @@ export async function endSession(req, res) {
       return res.status(400).json({ message: "Session is already completed" });
     }
 
-    // delete stream video call
-    const call = streamClient.video.call("default", session.callId);
-    await call.delete({ hard: true });
+    // delete stream video call and chat channel safely
+    try {
+      const call = streamClient.video.call("default", session.callId);
+      await call.delete({ hard: true });
+    } catch (streamErr) {
+      console.warn("Notice: Stream video call already deleted or expired:", streamErr.message);
+    }
 
-    // delete stream chat channel
-    const channel = chatClient.channel("messaging", session.callId);
-    await channel.delete();
+    try {
+      const channel = chatClient.channel("messaging", session.callId);
+      await channel.delete();
+    } catch (chatErr) {
+      console.warn("Notice: Stream chat channel already deleted or expired:", chatErr.message);
+    }
 
     session.status = "completed";
     await session.save();

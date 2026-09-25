@@ -15,15 +15,28 @@ const __dirname = path.resolve();
 
 // middlewares
 app.use(express.json());
-// Allow single or multiple origins (comma-separated or single URL)
-const allowedOrigins = ENV.CLIENT_URL ? ENV.CLIENT_URL.split(",").map((url) => url.trim()) : [];
+// Allow single or multiple origins (comma-separated or single URL) + localhost
+const configuredOrigins = ENV.CLIENT_URL
+  ? ENV.CLIENT_URL.split(",").map((url) => url.trim())
+  : [];
+const defaultLocalOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:3000",
+];
+const allowedOrigins = Array.from(new Set([...configuredOrigins, ...defaultLocalOrigins]));
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // allow requests with no origin (like mobile apps, curl, uptime bots)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      if (
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes(origin) ||
+        origin.includes("localhost") ||
+        origin.includes("127.0.0.1")
+      ) {
         return callback(null, true);
       }
       return callback(new Error(`CORS blocked for origin: ${origin}`));

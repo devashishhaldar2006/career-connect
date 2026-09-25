@@ -7,9 +7,25 @@ import { executeCode } from "../lib/piston";
 import Navbar from "../components/Navbar";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { getDifficultyBadgeClass } from "../lib/utils";
-import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
+import { 
+  Loader2, 
+  LogOut, 
+  PhoneOff, 
+  Users, 
+  CheckCircle, 
+  Terminal, 
+  Code2, 
+  FileText,
+  Volume2,
+  Columns,
+  Maximize2
+} from "lucide-react";
 import CodeEditorPanel from "../components/CodeEditorPanel";
 import OutputPanel from "../components/OutputPanel";
+import ProblemDescription from "../components/ProblemDescription";
+import InterviewTimer from "../components/InterviewTimer";
+import CollaborativePresenceBar from "../components/CollaborativePresenceBar";
+import InterviewSummaryModal from "../components/InterviewSummaryModal";
 
 import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
@@ -21,6 +37,10 @@ function SessionPage() {
   const { user } = useUser();
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+
+  // Active view tab for left panel on mobile / smaller viewports
+  const [leftTab, setLeftTab] = useState("problem"); // problem | editor
 
   const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
 
@@ -50,18 +70,20 @@ function SessionPage() {
   useEffect(() => {
     if (!session || !user || loadingSession) return;
     if (isHost || isParticipant) return;
+    if (session.status !== "active" || session.participant) return;
+    if (joinSessionMutation.isPending) return;
 
     joinSessionMutation.mutate(id, { onSuccess: refetch });
+  }, [session?.status, session?.participant, user?.id, loadingSession, isHost, isParticipant, id]);
 
-    // remove the joinSessionMutation, refetch from dependencies to avoid infinite loop
-  }, [session, user, loadingSession, isHost, isParticipant, id]);
-
-  // redirect the "participant" when session ends
+  // show completion summary when session ends
   useEffect(() => {
     if (!session || loadingSession) return;
 
-    if (session.status === "completed") navigate("/dashboard");
-  }, [session, loadingSession, navigate]);
+    if (session.status === "completed") {
+      setShowSummaryModal(true);
+    }
+  }, [session, loadingSession]);
 
   // update code when problem loads or changes
   useEffect(() => {
@@ -73,7 +95,6 @@ function SessionPage() {
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;
     setSelectedLanguage(newLang);
-    // use problem-specific starter code
     const starterCode = problemData?.starterCode?.[newLang] || "";
     setCode(starterCode);
     setOutput(null);
@@ -89,149 +110,100 @@ function SessionPage() {
   };
 
   const handleEndSession = () => {
-    if (confirm("Are you sure you want to end this session? All participants will be notified.")) {
-      // this will navigate the HOST to dashboard
-      endSessionMutation.mutate(id, { onSuccess: () => navigate("/dashboard") });
+    if (confirm("End this interview session? Both participants will be notified and transitioned to summary.")) {
+      endSessionMutation.mutate(id, {
+        onSuccess: () => {
+          setShowSummaryModal(true);
+        },
+      });
     }
   };
 
   return (
-    <div className="h-screen bg-base-100 flex flex-col">
+    <div className="h-screen bg-[#111215] text-[#ECEFF4] flex flex-col overflow-hidden font-sans select-none">
       <Navbar />
 
-      <div className="flex-1">
+      {/* Real-time collaborative presence bar */}
+      <CollaborativePresenceBar
+        session={session}
+        isHost={isHost}
+        isParticipant={isParticipant}
+        participantCount={session?.participant ? 2 : 1}
+      />
+
+      {/* Main Room Workspace Header & Tools */}
+      <div className="px-4 py-2 bg-[#15161A] border-b border-[#23252C] flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <h1 className="font-semibold text-sm text-[#FAFAFA] tracking-tight">
+              {session?.problem || "Interview Session"}
+            </h1>
+            <span
+              className={`px-2 py-0.5 rounded text-[10px] font-medium tracking-wide ${getDifficultyBadgeClass(
+                session?.difficulty
+              )}`}
+            >
+              {session?.difficulty?.toUpperCase() || "EASY"}
+            </span>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 text-xs text-[#71717A]">
+            <span>•</span>
+            <span>Room ID: <span className="font-mono text-[#A1A1AA]">{id?.slice(-6)}</span></span>
+          </div>
+        </div>
+
+        {/* Center / Right controls: Timer & End Session */}
+        <div className="flex items-center gap-3">
+          <InterviewTimer initialMinutes={45} isActive={session?.status === "active"} />
+
+          {isHost && session?.status === "active" && (
+            <button
+              onClick={handleEndSession}
+              disabled={endSessionMutation.isPending}
+              className="px-3 py-1.5 rounded-md text-xs font-semibold bg-[#361E21] hover:bg-[#4A262A] text-[#FCA5A5] border border-[#552A30] transition-colors flex items-center gap-2"
+            >
+              {endSessionMutation.isPending ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <LogOut className="size-3.5" />
+              )}
+              <span>Conclude Interview</span>
+            </button>
+          )}
+
+          {session?.status === "completed" && (
+            <button
+              onClick={() => setShowSummaryModal(true)}
+              className="px-3 py-1.5 rounded-md text-xs font-semibold bg-[#1F2C23] text-[#7FD69E] border border-[#2D4534] hover:bg-[#26372B] transition-colors"
+            >
+              View Summary
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Core Split Workspace */}
+      <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal">
-          {/* LEFT PANEL - CODE EDITOR & PROBLEM DETAILS */}
-          <Panel defaultSize={50} minSize={30}>
+          {/* LEFT PRIMARY PANEL - PROBLEM & CODE STUDIO */}
+          <Panel defaultSize={55} minSize={35}>
             <PanelGroup direction="vertical">
-              {/* PROBLEM DSC PANEL */}
-              <Panel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-y-auto bg-base-200">
-                  {/* HEADER SECTION */}
-                  <div className="p-6 bg-base-100 border-b border-base-300">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h1 className="text-3xl font-bold text-base-content">
-                          {session?.problem || "Loading..."}
-                        </h1>
-                        {problemData?.category && (
-                          <p className="text-base-content/60 mt-1">{problemData.category}</p>
-                        )}
-                        <p className="text-base-content/60 mt-2">
-                          Host: {session?.host?.name || "Loading..."} •{" "}
-                          {session?.participant ? 2 : 1}/2 participants
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`badge badge-lg ${getDifficultyBadgeClass(
-                            session?.difficulty
-                          )}`}
-                        >
-                          {session?.difficulty.slice(0, 1).toUpperCase() +
-                            session?.difficulty.slice(1) || "Easy"}
-                        </span>
-                        {isHost && session?.status === "active" && (
-                          <button
-                            onClick={handleEndSession}
-                            disabled={endSessionMutation.isPending}
-                            className="btn btn-error btn-sm gap-2"
-                          >
-                            {endSessionMutation.isPending ? (
-                              <Loader2Icon className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <LogOutIcon className="w-4 h-4" />
-                            )}
-                            End Session
-                          </button>
-                        )}
-                        {session?.status === "completed" && (
-                          <span className="badge badge-ghost badge-lg">Completed</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-6 space-y-6">
-                    {/* problem desc */}
-                    {problemData?.description && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                        <h2 className="text-xl font-bold mb-4 text-base-content">Description</h2>
-                        <div className="space-y-3 text-base leading-relaxed">
-                          <p className="text-base-content/90">{problemData.description.text}</p>
-                          {problemData.description.notes?.map((note, idx) => (
-                            <p key={idx} className="text-base-content/90">
-                              {note}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* examples section */}
-                    {problemData?.examples && problemData.examples.length > 0 && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                        <h2 className="text-xl font-bold mb-4 text-base-content">Examples</h2>
-
-                        <div className="space-y-4">
-                          {problemData.examples.map((example, idx) => (
-                            <div key={idx}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="badge badge-sm">{idx + 1}</span>
-                                <p className="font-semibold text-base-content">Example {idx + 1}</p>
-                              </div>
-                              <div className="bg-base-200 rounded-lg p-4 font-mono text-sm space-y-1.5">
-                                <div className="flex gap-2">
-                                  <span className="text-primary font-bold min-w-[70px]">
-                                    Input:
-                                  </span>
-                                  <span>{example.input}</span>
-                                </div>
-                                <div className="flex gap-2">
-                                  <span className="text-secondary font-bold min-w-[70px]">
-                                    Output:
-                                  </span>
-                                  <span>{example.output}</span>
-                                </div>
-                                {example.explanation && (
-                                  <div className="pt-2 border-t border-base-300 mt-2">
-                                    <span className="text-base-content/60 font-sans text-xs">
-                                      <span className="font-semibold">Explanation:</span>{" "}
-                                      {example.explanation}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Constraints */}
-                    {problemData?.constraints && problemData.constraints.length > 0 && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                        <h2 className="text-xl font-bold mb-4 text-base-content">Constraints</h2>
-                        <ul className="space-y-2 text-base-content/90">
-                          {problemData.constraints.map((constraint, idx) => (
-                            <li key={idx} className="flex gap-2">
-                              <span className="text-primary">•</span>
-                              <code className="text-sm">{constraint}</code>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+              {/* Problem Specification Panel */}
+              <Panel defaultSize={45} minSize={25}>
+                <div className="h-full overflow-hidden select-text">
+                  <ProblemDescription problem={problemData} />
                 </div>
               </Panel>
 
-              <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
+              {/* Vertical Resize Grip */}
+              <PanelResizeHandle className="h-1 bg-[#23252E] hover:bg-[#3E4352] transition-colors cursor-row-resize" />
 
-              <Panel defaultSize={50} minSize={20}>
+              {/* Code Editor & Execution Panel */}
+              <Panel defaultSize={55} minSize={30}>
                 <PanelGroup direction="vertical">
-                  <Panel defaultSize={70} minSize={30}>
+                  {/* Editor */}
+                  <Panel defaultSize={68} minSize={35}>
                     <CodeEditorPanel
                       selectedLanguage={selectedLanguage}
                       code={code}
@@ -242,38 +214,47 @@ function SessionPage() {
                     />
                   </Panel>
 
-                  <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
+                  <PanelResizeHandle className="h-1 bg-[#23252E] hover:bg-[#3E4352] transition-colors cursor-row-resize" />
 
-                  <Panel defaultSize={30} minSize={15}>
-                    <OutputPanel output={output} />
+                  {/* Output Terminal Console */}
+                  <Panel defaultSize={32} minSize={20}>
+                    <OutputPanel
+                      output={output}
+                      isRunning={isRunning}
+                      expectedOutput={problemData?.expectedOutput?.[selectedLanguage]}
+                    />
                   </Panel>
                 </PanelGroup>
               </Panel>
             </PanelGroup>
           </Panel>
 
-          <PanelResizeHandle className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize" />
+          {/* Central Workspace Horizontal Resize Grip */}
+          <PanelResizeHandle className="w-1 bg-[#23252E] hover:bg-[#3E4352] transition-colors cursor-col-resize" />
 
-          {/* RIGHT PANEL - VIDEO CALLS & CHAT */}
-          <Panel defaultSize={50} minSize={30}>
-            <div className="h-full bg-base-200 p-4 overflow-auto">
+          {/* RIGHT PRIMARY PANEL - VIDEO FEEDS, AUDIO & COLLABORATIVE STREAM */}
+          <Panel defaultSize={45} minSize={30}>
+            <div className="h-full bg-[#131418] p-3 overflow-hidden select-text">
               {isInitializingCall ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <Loader2Icon className="w-12 h-12 mx-auto animate-spin text-primary mb-4" />
-                    <p className="text-lg">Connecting to video call...</p>
+                <div className="h-full flex items-center justify-center rounded-lg border border-[#23252E] bg-[#16171C]">
+                  <div className="text-center p-6 space-y-3">
+                    <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#94A3B8]" />
+                    <p className="text-sm font-semibold text-[#FAFAFA]">
+                      Initializing WebRTC Real-Time Media...
+                    </p>
+                    <p className="text-xs text-[#71717A]">Setting up audio/video peers</p>
                   </div>
                 </div>
               ) : !streamClient || !call ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="card bg-base-100 shadow-xl max-w-md">
-                    <div className="card-body items-center text-center">
-                      <div className="w-24 h-24 bg-error/10 rounded-full flex items-center justify-center mb-4">
-                        <PhoneOffIcon className="w-12 h-12 text-error" />
-                      </div>
-                      <h2 className="card-title text-2xl">Connection Failed</h2>
-                      <p className="text-base-content/70">Unable to connect to the video call</p>
+                <div className="h-full flex items-center justify-center rounded-lg border border-[#23252E] bg-[#16171C]">
+                  <div className="p-8 max-w-sm text-center space-y-3">
+                    <div className="size-12 rounded-full bg-[#2C181A] border border-[#482025] flex items-center justify-center mx-auto text-[#F87171]">
+                      <PhoneOff className="size-6" />
                     </div>
+                    <h2 className="text-base font-bold text-[#FAFAFA]">Audio/Video Stream Inactive</h2>
+                    <p className="text-xs text-[#9CA3AF]">
+                      Unable to establish Stream media feed or credentials need verification. You can still code, run tests, and collaborate.
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -289,6 +270,15 @@ function SessionPage() {
           </Panel>
         </PanelGroup>
       </div>
+
+      {/* Completion & Performance Debrief Modal */}
+      <InterviewSummaryModal
+        isOpen={showSummaryModal}
+        onClose={() => setShowSummaryModal(false)}
+        session={session}
+        problemData={problemData}
+        onReturnToDashboard={() => navigate("/dashboard")}
+      />
     </div>
   );
 }

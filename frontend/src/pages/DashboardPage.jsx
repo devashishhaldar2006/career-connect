@@ -48,7 +48,7 @@ function DashboardPage() {
   const recentSessions = recentSessionsData?.sessions || [];
 
   const isUserInSession = (session) => {
-    if (!user.id) return false;
+    if (!user?.id) return false;
 
     return (
       session.host?.clerkId === user.id ||
@@ -57,31 +57,29 @@ function DashboardPage() {
   };
 
   return (
-    <>
-      <div className="min-h-screen bg-base-300">
-        <Navbar />
-        <WelcomeSection onCreateSession={() => setShowCreateModal(true)} />
+    <div className="min-h-screen bg-[#111215] text-[#ECEFF4] font-sans">
+      <Navbar />
+      <WelcomeSection onCreateSession={() => setShowCreateModal(true)} />
 
-        {/* Grid layout */}
-        <div className="container mx-auto px-6 pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <StatsCards
-              activeSessionsCount={activeSessions.length}
-              recentSessionsCount={recentSessions.length}
-            />
-            <ActiveSessions
-              sessions={activeSessions}
-              isLoading={loadingActiveSessions}
-              isUserInSession={isUserInSession}
-            />
-          </div>
-
-          <RecentSessions
-            sessions={recentSessions}
-            isLoading={loadingRecentSessions}
+      {/* Main Workspace Layout */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <StatsCards
+            activeSessionsCount={activeSessions.length}
+            recentSessionsCount={recentSessions.length}
+          />
+          <ActiveSessions
+            sessions={activeSessions}
+            isLoading={loadingActiveSessions}
+            isUserInSession={isUserInSession}
           />
         </div>
-      </div>
+
+        <RecentSessions
+          sessions={recentSessions}
+          isLoading={loadingRecentSessions}
+        />
+      </main>
 
       <CreateSessionModal
         isOpen={showCreateModal}
@@ -91,7 +89,7 @@ function DashboardPage() {
         onCreateRoom={handleCreateRoom}
         isCreating={createSessionMutation.isPending}
       />
-    </>
+    </div>
   );
 }
 

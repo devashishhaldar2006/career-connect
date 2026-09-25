@@ -1,104 +1,96 @@
-
-import { Code2, Clock, Users, Trophy, Loader } from "lucide-react";
+import { Code2, Clock, Users, Trophy, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router";
 
-function RecentSessions({ sessions, isLoading }) {
+export default function RecentSessions({ sessions, isLoading }) {
   return (
-    <div className="card bg-base-100 border-2 border-accent/20 hover:border-accent/30 mt-8">
-      <div className="card-body">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-gradient-to-br from-accent to-secondary rounded-xl">
-            <Clock className="w-5 h-5 text-white" />
+    <div className="rounded-xl bg-[#16171C] border border-[#24262E] overflow-hidden mt-6">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#24262E] bg-[#181A20]">
+        <div className="flex items-center gap-3">
+          <div className="size-8 rounded-lg bg-[#20222A] border border-[#2C303B] flex items-center justify-center text-[#A1A1AA]">
+            <Clock className="size-4" />
           </div>
-          <h2 className="text-2xl font-black">Your Past Sessions</h2>
+          <div>
+            <h2 className="text-sm font-bold text-[#FAFAFA] tracking-tight">
+              Session History & Past Debriefs
+            </h2>
+            <p className="text-[11px] text-[#71717A]">
+              Review previously completed interview rounds and outcomes
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {isLoading ? (
-            <div className="col-span-full flex items-center justify-center py-20">
-              <Loader className="w-10 h-10 animate-spin text-primary" />
-            </div>
-          ) : sessions.length > 0 ? (
-            sessions.map((session) => (
+        <span className="text-xs text-[#71717A] font-mono">
+          {sessions.length} Recorded
+        </span>
+      </div>
+
+      {/* Grid */}
+      <div className="p-5">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-16 text-[#71717A] space-y-2">
+            <Loader2 className="size-6 animate-spin text-[#9CA3AF]" />
+            <span className="text-xs">Loading session history...</span>
+          </div>
+        ) : sessions.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sessions.map((session) => (
               <div
                 key={session._id}
-                className={`card relative ${
-                  session.status === "active"
-                    ? "bg-success/10 border-success/30 hover:border-success/60"
-                    : "bg-base-200 border-base-300 hover:border-primary/30"
-                }`}
+                className="p-4 rounded-lg bg-[#191B22] border border-[#262832] hover:border-[#383C4B] transition-all flex flex-col justify-between gap-3 group"
               >
-                {session.status === "active" && (
-                  <div className="absolute top-3 right-3">
-                    <div className="badge badge-success gap-1">
-                      <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
-                      ACTIVE
-                    </div>
-                  </div>
-                )}
-
-                <div className="card-body p-5">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        session.status === "active"
-                          ? "bg-gradient-to-br from-success to-success/70"
-                          : "bg-gradient-to-br from-primary to-secondary"
-                      }`}
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-medium tracking-wide ${getDifficultyBadgeClass(
+                        session.difficulty
+                      )}`}
                     >
-                      <Code2 className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-base mb-1 truncate">{session.problem}</h3>
-                      <span
-                        className={`badge badge-sm ${getDifficultyBadgeClass(session.difficulty)}`}
-                      >
-                        {session.difficulty}
-                      </span>
-                    </div>
-                  </div>
+                      {session.difficulty}
+                    </span>
 
-                  <div className="space-y-2 text-sm opacity-80 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      <span>
-                        {formatDistanceToNow(new Date(session.createdAt), {
-                          addSuffix: true,
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      <span>
-                        {session.participant ? "2" : "1"} participant
-                        {session.participant ? "s" : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-base-300">
-                    <span className="text-xs font-semibold opacity-80 uppercase">Completed</span>
-                    <span className="text-xs opacity-40">
-                      {new Date(session.updatedAt).toLocaleDateString()}
+                    <span className="text-[11px] text-[#71717A] font-mono">
+                      {formatDistanceToNow(new Date(session.createdAt), { addSuffix: true })}
                     </span>
                   </div>
+
+                  <h3 className="font-semibold text-sm text-[#FAFAFA] truncate">
+                    {session.problem}
+                  </h3>
+
+                  <p className="text-xs text-[#8E929E] mt-1">
+                    Host: <span className="text-[#ECEFF4]">{session.host?.name || "Anonymous"}</span>
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-[#23252E] flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#7FD69E]">
+                    <CheckCircle2 className="size-3.5" />
+                    <span>Concluded</span>
+                  </div>
+
+                  <Link
+                    to={`/session/${session._id}`}
+                    className="text-[#9CA3AF] hover:text-[#FAFAFA] transition-colors flex items-center gap-1 font-medium text-xs"
+                  >
+                    <span>Inspect</span>
+                    <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-16">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-accent/20 to-secondary/20 rounded-3xl flex items-center justify-center">
-                <Trophy className="w-10 h-10 text-accent/50" />
-              </div>
-              <p className="text-lg font-semibold opacity-70 mb-1">No sessions yet</p>
-              <p className="text-sm opacity-50">Start your coding journey today!</p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center text-[#71717A] space-y-1.5">
+            <p className="text-sm font-medium text-[#9CA3AF]">No completed sessions yet</p>
+            <p className="text-xs text-[#6B7280]">
+              Once you conduct or participate in an interview, debrief logs will appear here.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-export default RecentSessions;

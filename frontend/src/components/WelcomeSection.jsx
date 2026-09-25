@@ -1,40 +1,41 @@
 import { useUser } from "@clerk/clerk-react";
-import { ArrowRightIcon, SparklesIcon, ZapIcon } from "lucide-react";
+import { Plus, Radio, Users, Sparkles, Terminal } from "lucide-react";
 
-function WelcomeSection({ onCreateSession }) {
+export default function WelcomeSection({ onCreateSession }) {
   const { user } = useUser();
 
   return (
-    <div className="relative overflow-hidden">
-      <div className="relative max-w-7xl mx-auto px-6 py-16">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <SparklesIcon className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-5xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Welcome back, {user?.firstName || "there"}!
-              </h1>
-            </div>
-            <p className="text-xl text-base-content/60 ml-16">
-              Ready to level up your coding skills?
-            </p>
+    <div className="border-b border-[#23252C] bg-[#141519]/70 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>
+            </span>
+            <span className="text-xs font-mono tracking-wider uppercase text-[#7FD69E]">
+              Studio Ready
+            </span>
           </div>
+
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#FAFAFA]">
+            Welcome back, {user?.firstName || "Engineer"}
+          </h1>
+          <p className="text-xs sm:text-sm text-[#A1A1AA] mt-1">
+            Host live collaborative interview sessions or join active coding rooms.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
           <button
             onClick={onCreateSession}
-            className="group px-8 py-4 bg-gradient-to-r from-primary to-secondary rounded-2xl transition-all duration-200 hover:opacity-90"
+            className="px-4 py-2.5 rounded-lg bg-[#252832] hover:bg-[#2D313D] text-[#FAFAFA] text-xs font-semibold border border-[#3A3F4E] shadow-sm transition-all flex items-center gap-2 active:scale-[0.98]"
           >
-            <div className="flex items-center gap-3 text-white font-bold text-lg">
-              <ZapIcon className="w-6 h-6" />
-              <span>Create Session</span>
-              <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </div>
+            <Plus className="size-4 text-[#A1A1AA]" />
+            <span>Launch Interview Room</span>
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-export default WelcomeSection;
