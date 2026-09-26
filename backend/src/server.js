@@ -13,6 +13,15 @@ const app = express();
 
 const __dirname = path.resolve();
 
+// 1. Lightweight Health-Check endpoint directly at top for Render / Cron-job uptime pings
+app.get(["/api/health", "/health", "/ping"], (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // middlewares
 app.use(express.json());
 // Allow single or multiple origins (comma-separated or single URL) + localhost
@@ -45,15 +54,6 @@ app.use(
   })
 );
 
-// Lightweight Health-Check endpoint for Render / Uptime monitors
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
-
 app.use(clerkMiddleware()); //this adds auth field to request object: req.auth()
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
@@ -65,7 +65,7 @@ app.use("/api/sessions", sessionRoutes);
 if (ENV.NODE_ENV === "production" && process.env.SERVE_FRONTEND === "true") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.get("/{*any}", (req, res) => {
+  app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
